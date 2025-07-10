@@ -17,7 +17,7 @@ experimentos = 1000
 def calcular_norma(phi: np.ndarray) -> float:
     return np.sqrt(np.sum(np.abs(phi)**2))
 
-@jit(cache=True, nopython=True, parallel=True)
+@jit(cache=True, nopython=True)
 def generar():
     k = 2.0 * PI * n_ciclos / N
     s = 1.0 / (4 * k * k)
