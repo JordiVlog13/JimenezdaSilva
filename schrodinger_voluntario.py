@@ -194,8 +194,8 @@ def main():
 
    end = time.time()
 
-    print(f"Máximo local de PD: {jmax}, valor: {PD[jmax]:.6e}")
-    print(f"Probabilidad de transmisión: {prob:.4f} ± {merr:.4f}")
-    print(f"Tiempo total de simulación: {end - start:.2f} s")
+   print(f"Máximo local de PD: {jmax}, valor: {PD[jmax]:.6e}")
+   print(f"Probabilidad de transmisión: {prob:.4f} ± {merr:.4f}")
+   print(f"Tiempo total de simulación: {end - start:.2f} s")
 if __name__ == '__main__':
     main()
