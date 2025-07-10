@@ -143,59 +143,56 @@ def main():
     mi = np.zeros(experimentos, dtype=int)
     mT = 0
 
-    # Abrir archivos de salida
-    with open(os.path.join(cwd,'datos_PD.dat'),'w') as f_PD, \
-         open(os.path.join(cwd,'datos_observables.dat'),'w') as f_obs:
 
-        # Generar coeficientes iniciales
-        k, s, V, phi, gamma, alpha = generar()
-        # Condiciones de contorno: beta[N-1]=xi[N]=xi[0]=0
-        beta = np.zeros(N, dtype=complex)
-        xi = np.zeros(N+1, dtype=complex)
-        beta[N-1] = 0+0j
-        xi[0]     = 0+0j
-        xi[N]     = 0+0j
+   # Generar coeficientes iniciales
+   k, s, V, phi, gamma, alpha = generar()
+   # Condiciones de contorno: beta[N-1]=xi[N]=xi[0]=0
+   beta = np.zeros(N, dtype=complex)
+   xi = np.zeros(N+1, dtype=complex)
+   beta[N-1] = 0+0j
+   xi[0]     = 0+0j
+   xi[N]     = 0+0j
 
-        start = time.time()
-        for m in range(experimentos):
-            for l in range(pasos):
-                # Probabilidad de transmisión
-                PD[l] = calcular_PD(phi)
-                f_PD.write(f"{l} {PD[l]:.6e} \n")
+   start = time.time()
+   for m in range(experimentos):
+       for l in range(pasos):
+           # Probabilidad de transmisión
+           PD[l] = calcular_PD(phi)
+           
 
-                # Observables y errores cada 10 pasos
-                if l % 10 == 0:
-                    x   = calcular_x(phi)
-                    p   = calcular_p(phi)
-                    T   = calcular_T(phi)
-                    Vobs= calcular_Vobs(V,phi)
-                    E   = calcular_E(phi,V)
-                    ex  = calcular_error_x(phi)
-                    ep  = calcular_error_p(phi)
-                    eT  = calcular_error_T(phi)
-                    eV  = calcular_error_V(phi,V)
-                    eE  = calcular_error_E(phi,V)
-                    f_obs.write(f"{l} {x:.6e} {ex:.6e} {p:.6e} {ep:.6e} {T:.6e} {eT:.6e} {Vobs:.6e} {eV:.6e} {E:.6e} {eE:.6e} \n")
+           # Observables y errores cada 10 pasos
+           if l % 10 == 0:
+               x   = calcular_x(phi)
+               p   = calcular_p(phi)
+               T   = calcular_T(phi)
+               Vobs= calcular_Vobs(V,phi)
+               E   = calcular_E(phi,V)
+               ex  = calcular_error_x(phi)
+               ep  = calcular_error_p(phi)
+               eT  = calcular_error_T(phi)
+               eV  = calcular_error_V(phi,V)
+               eE  = calcular_error_E(phi,V)
+               
 
-                # Avanzar un paso
-                calcular_beta(s, gamma, beta, phi, alpha, xi)
+           # Avanzar un paso
+           calcular_beta(s, gamma, beta, phi, alpha, xi)
 
-            # Monte Carlo usando máximo local
-            jmax = calcular_maximo(PD)
-            
+       # Monte Carlo usando máximo local
+       jmax = calcular_maximo(PD)
+       
 
-            p = random.random()
-            if p > PD[jmax]:
-                mi[m] = 1
-                mT += 1
-            else:
-                mi[m] = 0
-            
-        
-        prob = 1.0 * mT / experimentos
-        merr = np.sqrt(sum((mi[m] - prob)**2 for m in range(experimentos)) / experimentos)
+       p = random.random()
+       if p > PD[jmax]:
+           mi[m] = 1
+           mT += 1
+       else:
+           mi[m] = 0
+       
+   
+   prob = 1.0 * mT / experimentos
+   merr = np.sqrt(sum((mi[m] - prob)**2 for m in range(experimentos)) / experimentos)
 
-        end = time.time()
+   end = time.time()
 
     print(f"Máximo local de PD: {jmax}, valor: {PD[jmax]:.6e}")
     print(f"Probabilidad de transmisión: {prob:.4f} ± {merr:.4f}")
